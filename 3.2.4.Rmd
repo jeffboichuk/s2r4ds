@@ -18,7 +18,11 @@ An empty graph, which appears as a grey box in the Plots tab of RStudio. You can
 
 **2. How many rows are in `mtcars`? How many columns?**
 
-`str(mtcars)`, `nrow(mtcars)` in combination with `ncol(mtcars)`, and `dim(mtcars)` represent three ways you can arrive at the answer of 32 rows and 11 columns.
+Here are three ways to get the answer (32 rows and 11 columns):
+
+1. `str(mtcars)`
+2. `nrow(mtcars)` along with `ncol(mtcars)`
+3. `dim(mtcars)`
 
 **3. What does the `drv` variable describe? Read the help `?mpg` to find out.**
 
