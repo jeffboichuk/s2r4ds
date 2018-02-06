@@ -1,2 +1,3 @@
-# s2r4ds
-Solutions to R for Data Science
+# Solutions to the Exercises in R for Data Science
+
+* 
