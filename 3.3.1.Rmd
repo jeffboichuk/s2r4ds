@@ -1,0 +1,96 @@
+---
+title: "3.3.1 Solutions"
+output: github_document
+---
+
+The following questions stem from 
+[Section 3.3](http://r4ds.had.co.nz/data-visualisation.html#aesthetic-mappings) of Chapter 3 (Data Visualization) in [R for Data Science](http://r4ds.had.co.nz/). The "solutions" offer some answers. Issues and pull requests are very welcome here.
+
+### Load packages
+
+```{r load-packages, message = FALSE}
+library(tidyverse)
+```
+
+**1. What's gone wrong with this code? Why are the points not blue?**
+
+```{r fig.height = 3.5, fig.width = 5, fig.align = 'center'}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy, color = "blue"))
+```
+
+The color aesthetic needs to be set outside of the aes function, as follows:
+
+```{r echo = TRUE, fig.height = 3.5, fig.width = 5, fig.align = 'center'}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy), color = "blue")
+```
+
+**2. Which variables in `mpg` are categorical? Which variables are continuous? (Hint: type `?mpg` to read the documentation for the dataset.) How can you see this information when you run `mpg`?**
+
+Categorical: `manufacturer`, `model`, `year`, `trans`, `drv`, `fl`, and `class`.
+
+Continuous: `displ`, `cyl`, `cty`, and `hwy`.
+
+```{r}
+mpg
+```
+
+Running `mpg` displays the `mpg` data as a tibble. Under the variables' names, you can see their corresponding variable types, which are enclosed within arrows (e.g., below `manufacturer`, you see \<chr\>). Characters (chr), factors (fctr), and logicals (lgl) are all categorical variables, whereas integers (int) and floating point numbers (dbl) are both continuous variables.
+
+**3. Map a continuous variable to `color`, `size`, and `shape`. How do these aesthetics behave differently for categorical vs. continuous variables?**
+
+For the `color` aesthetic, continuous variables get mapped along a color spectrum.
+  
+```{r fig.height = 4, fig.width = 5, fig.align = 'center'}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy, color = cyl))
+```
+
+Encoding `cyl`, the number of cylinders in a vehicle, as a categorical variable "fixes" this issue, such that vehicles with different numbers of cylinders get assigned to different colors.
+
+```{r fig.height = 3.25, fig.width = 5, fig.align = 'center'}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy, color = as.factor(cyl)))
+```
+
+For continuous variables that are discrete and have a small number values, the next plot shows that the `size` aesthetic behaves the same with continuous variables as it does with categorical variables.
+
+```{r fig.height = 3.25, fig.width = 5, fig.align = 'center'}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy, size = cyl))
+```
+
+For the `shape` aesthetic, R returns an error message (i.e., "Error: A continuous variable cannot be mapped to shape").
+
+```{r echo = TRUE, eval = F}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy, shape = cyl))
+```
+
+**4. What happens if you map the same variable to multiple aesthetics?**
+
+Mapping a variable to the x or y axis as well as to another aesthetic creates redundancy. For example, in the next plot, the y axis and the legend provide redundant information.
+
+```{r fig.height = 3.5, fig.width = 5, fig.align = 'center'}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy, color = hwy))
+```
+
+**5. What does the `stroke` aesthetic do? What shapes does it work with? (Hint: use `?geom_point`.)**
+  
+The `stroke` aesthetic modifies the width of a data point's borders. It only works for shapes 21-24.
+
+```{r fig.height = 3, fig.width = 4, fig.align = 'center'}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy), shape = 22, stroke = .8)
+```
+
+**6. What happens if you map an aesthetic to something other than a variable name, like `aes(colour = displ < 5)`?**
+
+`ggplot` uses logical arguments (like `aes(colour = displ < 5)`) to map values from data (like `displ == 6`) to levels of aesthetic properties (like `"red"`). In this case, the decision rule determines what color a data point gets assigned.
+
+```{r}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy, color = displ < 5))
+```
