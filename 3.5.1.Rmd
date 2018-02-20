@@ -1,0 +1,105 @@
+---
+title: "3.5.1 Solutions"
+output: github_document
+---
+
+Reminders: Add link for Section 3.5. Add a link to the continuous question from Section 3.3. Add links for Wickham and Tufte. 
+
+The following questions stem from 
+[Section 3.#]() of Chapter 3 (Data Visualization) in [R for Data Science](http://r4ds.had.co.nz/). The "solutions" offer some answers. Issues and pull requests are very welcome here.
+
+### Load packages
+
+```{r load-packages, message = FALSE}
+library(tidyverse)
+```
+
+#### 1. What happens if you facet on a continuous variable? 
+
+Faceting on a continuous variable, such as `cty`, creates a large number of plots (see below), which makes it difficult to communicate anything meaningful. It is particularly difficult to communicate anything meaningful with a dataset like `mpg` that is sparse.
+
+```{r fig.align = 'center'}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) + 
+  facet_wrap(~ cty)
+```
+
+#### 2. What do the empty cells in the plot with `facet_grid(drv ~ cyl)` mean? How do they relate to this plot?
+
+Empty cells mean that observations do not exist for certain combinations of variables. For example, there is no vehicle in `mpg` with five cylinders and 4-wheel drive.
+
+```{r fig.align = 'center'}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) + 
+  facet_grid(drv ~ cyl)
+```
+
+#### 3. What plots does the following code make? What does `.` do?
+
+The graph below illustrates the relationship between engine size and highway miles per gallon for all three drive-train types. The facets are represented in separate rows. The help documentation for `facet_grid` states that "the dot in the formula is used to indicate there should be no faceting on this dimension."
+
+```{r fig.align = 'center'}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) +
+  facet_grid(drv ~ .)
+```
+
+The next graph illustrates the relationship between engine size and highway miles per gallon for all four cylinder sizes. The facets are represented in separate columns.
+
+```{r fig.align = 'center'}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) +
+  facet_grid(. ~ cyl)
+```
+
+#### 4. Take the first faceted plot in this section:
+
+```{r fig.align = 'center'}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) + 
+  facet_wrap(~ class, nrow = 2)
+```
+
+#### What are the advantages to using faceting instead of the colour aesthetic?
+
+Faceting uses multiple views to illustrate different partitions of a dataset and make it easier to inspect the relationship between x and y for a given subset of data. Said differently, faceting makes it possible to display small multiples, which "facilitates comparison by creating the same chart for multiple subsets of your data" (Wickham 2009). In "Envisioning Information," Tufte writes, "At the heart of quantitative reasoning is a single question: Compared to what? Small multiple designs, multivariate and data bountiful, answer directly by visually enforcing comparisons of changes, of the differences among objects, of the scope of alternatives. For a wide range of problems in data presentation, small multiples are the best design solution.” Read more [here](http://sharpsightlabs.com/blog/small-multiples-ggplot/).
+
+#### What are the disadvantages? How might the balance change if you had a larger dataset?
+
+If categories differ widely on the x or y axes, certain cells will get dwarfed. Plus, `facet_wrap()` and `facet_grid()` do not produce legends, so categories need to be self-defining.
+
+#### 5. Read `?facet_wrap`. What does `nrow` do? What does `ncol` do? What other options control the layout of the individual panels? Why doesn’t `facet_grid()` have `nrow` and `ncol` variables?
+
+`nrow` and `ncol` set how many rows and columns a `facet_wrap()` layer of a plot will have.
+
+The other options that control the layout of individual panels are `drop`, `scales`, `dir`, and `strip.position`. The `drop` option determines whether factor levels should be dropped if they do not exist in the data (it is `TRUE` by default).
+
+The `scales` option fixes the x axis and y axis or leaves them free to vary (i.e., with `"free"`, `"free_x"`, or `"free_y"`), as follows:
+
+```{r fig.align = 'center'}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) + 
+  facet_wrap(~ class, nrow = 2, scales = "free_y")
+```
+
+The `dir` option determines the direction that individual facets are displayed in (`"h"` for horizontal is the # default; can be changed to `"v"` for vertical). See below:
+
+```{r fig.align = 'center'}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) + 
+  facet_wrap(~ class, dir = "v", nrow = 2)
+```
+
+The `strip.position` option allows you to determine where labels are displayed for the individual facets. This code switches the labels to the bottom:
+
+```{r fig.align = 'center'}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) + 
+  facet_wrap(~ class, nrow = 2, strip.position = "bottom")
+```
+
+`facet_grid()` does not have `nrow` or `ncol` arguments because the variables supplied to the `facets` formula of `facet_grid()` determine the number of rows and columns in a matrix of panels.
+
+#### 6. When using `facet_grid()` you should usually put the variable with more unique levels in the columns. Why?
+
+Because most screens are wider than they are tall.
